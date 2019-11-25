@@ -55,7 +55,7 @@ mongoose.connect(process.env.URLDB, {
 
         console.log('Base de datos corriendo y conectada');
     }
-);
+).catch(err => console.log(err));
 
 // db(config.dbUrl)
 //     .then(resp => console.log('corriendo'))
