@@ -21,6 +21,5 @@ const config = {
     // filesRoute: process.env.FILES_ROUTE || 'files',
 };
 
-process.env.URLBD = BD
 
 module.exports = config;

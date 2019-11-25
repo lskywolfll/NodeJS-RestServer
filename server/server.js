@@ -1,6 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
-// const db = require('./config/db');
+// const mongoose = require('mongoose');
+const db = require('./config/db');
 
 const app = express();
 const bodyParser = require('body-parser');
@@ -44,20 +44,22 @@ app.get('/', (req, res) => {
     res.send('Hola');
 });
 
-mongoose.connect(process.env.URLBD, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-},
-    (err, res) => {
-        if (err) throw err;
+// mongoose.connect('mongodb://localhost:27017/cafe', {
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useFindAndModify: false
+// },
+//     (err, res) => {
+//         if (err) throw err;
 
-        console.log('Base de datos corriendo localmente y conectada');
-    }
-);
+//         console.log('Base de datos corriendo localmente y conectada');
+//     }
+// );
 
-// db(config.dbUrl);
+db(config.dbUrl)
+    .then(resp => console.log('corriendo'))
+    .catch(err => console.log(err));
 
 app.listen(config.port, () => {
     console.log(`Se ha iniciado el servidor en: ${config.host}:${config.port}`);
