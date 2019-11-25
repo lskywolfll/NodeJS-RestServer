@@ -14,7 +14,6 @@ if(process.env.NODE_ENV === 'dev'){
 }
 
 const config = {
-    entorno: process.env.NODE_ENV || 'dev',
     dbUrl: BD,
     port: process.env.PORT || 3000,
     host: process.env.HOST || 'http://localhost',
@@ -22,5 +21,6 @@ const config = {
     // filesRoute: process.env.FILES_ROUTE || 'files',
 };
 
+process.env.URLBD = BD
 
 module.exports = config;
