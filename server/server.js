@@ -1,6 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
-// const db = require('./config/db');
+// const mongoose = require('mongoose');
+const db = require('./config/db');
 
 const app = express();
 const bodyParser = require('body-parser');
@@ -14,7 +14,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.use(require('./routes/usuario'));
+// Routes
+app.use(require('./routes/index'));
 
 // Serializar el contenido a json con bodyparser
 // Este extraer una porcion del cuepor de los datos que se envian por el req.body
@@ -44,23 +45,21 @@ app.get('/', (req, res) => {
     res.send('Hola');
 });
 
-mongoose.connect(process.env.URLDB, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-},
-    (err, res) => {
-        if (err) throw err;
+// mongoose.connect('mongodb://localhost:27017/cafe', {
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useFindAndModify: false
+// },
+//     (err, res) => {
+//         if (err) throw err;
 
-        console.log('Base de datos corriendo y conectada');
-    }
-).catch(err => console.log(err));
+//         console.log('Base de datos corriendo localmente y conectada');
+//     }
+// );
 
-// db(config.dbUrl)
-//     .then(resp => console.log('corriendo'))
-//     .catch(err => console.log(err));
+db(config.dbUrl);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Se ha iniciado el servidor en: http://localhost:${process.env.PORT}`);
+app.listen(config.port, () => {
+    console.log(`Se ha iniciado el servidor en: ${config.host}:${config.port}`);
 });
