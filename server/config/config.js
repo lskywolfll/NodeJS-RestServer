@@ -25,7 +25,7 @@ process.env.CADUCIDAD_TOKEN = 60 * 60 * 24 * 30;
 // SEED de autenticacion
 /////////////////////////////////////////
 process.env.SEED = process.env.SEED || 'este-es-el-seed-desarrollo';
-
+// Configuraciones globales
 const config = {
     entorno: process.env.NODE_ENV || 'dev',
     dbUrl: process.env.MONGO_URI,
