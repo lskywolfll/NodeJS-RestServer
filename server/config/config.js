@@ -35,5 +35,4 @@ const config = {
     // filesRoute: process.env.FILES_ROUTE || 'files',
 };
 
-
 module.exports = config;
