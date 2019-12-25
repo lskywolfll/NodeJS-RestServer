@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Google Sign-in demo</title>
+    <!-- Partes necesarias de google -->
+    <meta name="google-signin-client_id"
+        content="540518646221-temfb450eer1qqbdbffgaf1uh53bo7k3.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+
+<body>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+    <a href="#" onclick="signOut();">Sign out</a>
+    <script>
+        function onSignIn(googleUser) {
+            let profile = googleUser.getBasicProfile();
+
+            let id_token = googleUser.getAuthResponse().id_token;
+
+            // Solo para tomar el token y probarla con postman
+            // console.log(id_token);
+
+            // Crear una peticion para enviarle el token al backend
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/google');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                console.log('Signed in as: ' + xhr.responseText);
+            };
+            // Envio de datos a la api rest
+            // xhr.send('idtoken=' + 1 +'&'+ 'nombre='+'hola');
+            // Similar al enviar query por parametros
+            xhr.send(`idtoken=${id_token}`);
+        }
+
+        function signOut() {
+            let auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+            });
+        }
+
+    </script>
+</body>
+
+</html>
