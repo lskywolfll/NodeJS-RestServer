@@ -39,6 +39,6 @@ const config = {
 /////// Google Client ID
 /////////////////////////////////
 
-process.env.CLIENT_ID = process.env.CLIENT_ID || "540518646221-temfb450eer1qqbdbffgaf1uh53bo7k3.apps.googleusercontent.com";
+process.env.CLIENT_ID = process.env.CLIENT_ID || "735872792975-mqpeph9ia3tvp98o1folegui491s2bs3.apps.googleusercontent.com";
 
 module.exports = config;
