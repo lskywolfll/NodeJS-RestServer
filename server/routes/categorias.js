@@ -2,13 +2,14 @@ const express = require('express');
 const app = express();
 // Toma de valores especifidos mediante una funcion
 const _ = require('underscore');
+// Middlewares de seguridad
 const { verficarToken, verificarAdmin_Role } = require('../middleware/autenticacion');
 const Categoria = require('../models/categorias');
 // Funciones del tiempo
 const { Fecha_Formatear } = require('../Controllers/ControladorDeTiempo');
 
 // Todas Las categorias
-app.get('/categorias', (req, res) => {
+app.get('/categorias',verficarToken, (req, res) => {
     Categoria.find({}, 'tipo descripcion fecha usuario')
         .exec((err, categorias) => {
             if (err) {
@@ -25,15 +26,24 @@ app.get('/categorias', (req, res) => {
         });
 });
 // Mostrar una categoria por id
-app.get('/categoria/:id', (req, res) => {
+app.get('/categoria/:id',verficarToken, (req, res) => {
     // Categoria.findById
     const id = req.params.id;
 
     Categoria.findById(id, (err, categoriaDB) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(500).json({
                 ok: false,
                 err
+            });
+        }
+
+        if(!categoriaDB){
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'No existe la categoria con el id ingresado'
+                }
             });
         }
 
@@ -50,9 +60,18 @@ app.put('/categoria/:id', verficarToken,(req, res) => {
 
     Categoria.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, categodiaDB) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(500).json({
                 ok: false,
                 err
+            });
+        }
+
+        if(!categodiaDB){
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'No existe la categoria con el id ingresado'
+                }
             });
         }
 
@@ -86,8 +105,10 @@ app.post('/categoria', verficarToken, (req, res) => {
         if(!categoriaDB){
             return res.status(400).json({
                 ok: false,
-                err
-            })
+                err: {
+                    message: 'No se ha podido crear la categoria '
+                }
+            });
         }
 
         return res.status(200).json({
@@ -103,9 +124,18 @@ app.delete('/categoria/:id', [verficarToken, verificarAdmin_Role],(req, res) => 
 
     Categoria.findByIdAndRemove(id, (err, categoriaBorrada) => {
         if (err || !categoriaBorrada) {
-            return res.status(400).json({
+            return res.status(500).json({
                 ok: false,
                 message: 'Categoria no encontrada'
+            });
+        }
+
+        if(!categoriaDB){
+            return res.status(400).json({
+                ok: false,
+                err:{
+                    message: 'No existe la categoria con el id ingresado'
+                }
             });
         }
 
