@@ -10,7 +10,15 @@ const { Fecha_Formatear } = require('../Controllers/ControladorDeTiempo');
 
 // Todas Las categorias
 app.get('/categorias',verficarToken, (req, res) => {
-    Categoria.find({}, 'tipo descripcion fecha usuario')
+    Categoria.find({})
+        //Sort para ordenar en base a un campo del esquema del modelo en uso
+        .sort('descripcion')
+        // Buscar la informacion de otra tabla(coleccion) y seleccionar ciertos campos 
+        //NT: El tipo de propiedad en el esquema usado(modelo) debe ser el tipo object id y dejarle la referencia a la cual estara apuntando y mediante ello hacer el populate
+        // populate params
+        // 1- coleccion
+        // 2- seleccion de campos que posee, si no se pone nada te traera toda la info que posea en base a su id
+        .populate('usuario', 'nombre email')
         .exec((err, categorias) => {
             if (err) {
                 return res.status(400).json({
@@ -91,7 +99,7 @@ app.post('/categoria', verficarToken, (req, res) => {
         tipo: req.body.tipo,
         descripcion: req.body.descripcion,
         fecha: fecha,
-        usuario: req.usuario.nombre
+        usuario: req.usuario._id
     });
 
     categoria.save((err, categoriaDB) => {

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator'); 
+const uniqueValidator = require('mongoose-unique-validator');
 
 // Crear schema en mongo para que sea el objeto(Tabla) de la base de datos por su estructura
 let Schema = mongoose.Schema;
@@ -20,8 +20,10 @@ let categoriaSchema = new Schema({
         required: [true, 'La fecha es necesaria']
     },
     usuario: {
-        type: String,
-        required: [true, 'El ser un usuario es necesario']
+        // Crear una busqueda dinamica mediante el typo id para cuando busqueos los datos de otra tabla(coleccion) tomara la base de este id para buscarla en la tabla respectiva que estemos haciendo un cruce de datos para obtenerlo
+        type: mongoose.Schema.Types.ObjectId,
+        required: [true, 'El ser un usuario es necesario'],
+        ref: 'Usuario'
     }
 });
 
