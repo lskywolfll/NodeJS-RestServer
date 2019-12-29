@@ -45,5 +45,13 @@ productoSchema.plugin(uniqueValidator, {
     message: '{PATH} debe de ser único'
 });
 
+// productoSchema.methods.toJSON = function(){
+    
+//     let product = this;
+//     let productObject = product.toObject();
+
+//     return productObject;
+// }
+
 // Al crear un modelo de datos debemos indicar primero el nombre clave que tendra y luego poner el schema en el cual se basa
 module.exports = mongoose.model('Producto', productoSchema);

@@ -32,5 +32,15 @@ categoriaSchema.plugin(uniqueValidator, {
     message: '{PATH} debe de ser único'
 });
 
+// Cambia el retorno descartando algunas propiedades que posea para dar mas seguridad a esos datos que no deben ser visibles
+// categoriaSchema.methods.toJSON = function () {
+
+//     let category = this;
+//     let categoryObject = category.toObject();
+//     delete categoryObject.usuario;
+
+//     return categoryObject;
+// }
+
 // Al crear un modelo de datos debemos indicar primero el nombre clave que tendra y luego poner el schema en el cual se basa
 module.exports = mongoose.model('Categoria', categoriaSchema);
