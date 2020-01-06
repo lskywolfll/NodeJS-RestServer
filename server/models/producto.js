@@ -30,6 +30,7 @@ let productoSchema = new Schema({
     categoria:{
         type: mongoose.Schema.Types.ObjectId,
         required: [true, 'La categoria es necesaria'],
+        // El ref: 'collection' estara aputando a ella para de tal forma el id que posee esta propiedad que este ligada a esa coleccion unicamente y debe existir sino no se podra crear un producto o actualizar
         ref: 'Categoria'
     },
     usuario: {
@@ -44,14 +45,6 @@ let productoSchema = new Schema({
 productoSchema.plugin(uniqueValidator, {
     message: '{PATH} debe de ser único'
 });
-
-// productoSchema.methods.toJSON = function(){
-    
-//     let product = this;
-//     let productObject = product.toObject();
-
-//     return productObject;
-// }
 
 // Al crear un modelo de datos debemos indicar primero el nombre clave que tendra y luego poner el schema en el cual se basa
 module.exports = mongoose.model('Producto', productoSchema);
