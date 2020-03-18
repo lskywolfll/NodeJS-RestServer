@@ -1,7 +1,10 @@
 const express = require('express');
+const fs = require('fs');
 // middleware automatico para poder subir archivos
+const path = require('path');
 const fileUpload = require('express-fileupload');
 const app = express();
+const { verficarToken } = require('../middleware/autenticacion');
 
 const extensionesValidas = ['jpg', 'png', 'pdf', 'jpeg'];
 // opciones por defecto y habilitacion de creacion de arcihvos 
@@ -10,7 +13,20 @@ app.use(fileUpload({ useTempFiles: true }));
 
 app.post('/upload', (req, res) => {
 
-    console.log(req.files);
+    let tieneComentarios = false;
+
+    // console.log(req.files);
+    console.log(req.body);
+
+    if (req.body.comentarios && req.body.comentarios != 'null' && req.body.comentarios != null) {
+        tieneComentarios = true;
+        req.body.comentarios = JSON.parse(req.body.comentarios)
+
+        // req.body.comentarios.forEach(element => {
+        //     console.log('dentro del foreach');
+        //     console.log(element);
+        // });
+    }
 
     if (!req.files) {
         return res.status(400).json({
@@ -20,6 +36,10 @@ app.post('/upload', (req, res) => {
             }
         })
     }
+
+    let nombreFalse = req.body.idUsuario;
+
+    let carpetaDestino = path.join(__dirname.split('server')[0] + `uploads/usuarios/${nombreFalse}`);
 
     if (req.files.archivos.length > 1) {
         // Itero multiples archivos
@@ -35,7 +55,13 @@ app.post('/upload', (req, res) => {
                 });
             }
 
-            archivo.mv(`uploads/${archivo.name}`, (err) => {
+            fs.mkdirSync(carpetaDestino, { recursive: true }, (err) => {
+                if (err) throw err;
+
+                console.log('se ha creado exitosamente');
+            });
+
+            archivo.mv(`${carpetaDestino}/${archivo.name}`, (err) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
@@ -45,11 +71,19 @@ app.post('/upload', (req, res) => {
             })
         });
 
+        fs.rmdir(carpetaDestino, { recursive: true }, (err) => {
+            if (err) throw err;
+
+            console.log('Se elimino la carpeta correctamente');
+        })
+
         return res.status(200).json({
             ok: true,
             message: 'Se ha subido correctamente',
             archivos: req.files.archivos
         });
+
+
     } else {
         let archivoEjemplo = req.files.archivos;
 
@@ -63,30 +97,61 @@ app.post('/upload', (req, res) => {
                 }
             });
         } else {
-            archivoEjemplo.mv(`uploads/${archivoEjemplo.name}`, (err) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        err
-                    });
-                }
+            fs.mkdirSync(carpetaDestino, { recursive: true }, (err) => { if (err) throw err; });
+
+            if (tieneComentarios) {
+                req.body.comentarios.forEach(element => {
+                    // console.log(element);
+                    if (element.comentario) {
+                        let ubicacionArchivo = carpetaDestino + `/${element.comentario}`
+                        console.log(ubicacionArchivo);
+                        fs.mkdirSync(ubicacionArchivo, { recursive: true }, (err) => {
+                            if (err) throw err;
+
+                           console.log('Se creo correctamente');
+                        })
+
+                        element.archivosAsociados.forEach(nombres => {
+                            if (nombres == archivoEjemplo.name) {
+                                archivoEjemplo.mv(`${ubicacionArchivo}/${archivoEjemplo.name}`, (err) => {
+                                    if (err) throw err;
+
+                                    console.log('paso');
+                                })
+                            }
+                        });
+                    }
+                });
 
                 return res.status(200).json({
                     ok: true,
-                    message: 'Se ha subido correctamente',
+                    message: 'Se ha subido correctamente 1',
                     detalles: {
                         name: archivoEjemplo.name,
                         extension: archivoEjemplo.mimetype
                     }
                 });
-            });
+            } else {
+                archivoEjemplo.mv(`${carpetaDestino}/${archivoEjemplo.name}`, (err) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            err
+                        });
+                    }
+
+                    return res.status(200).json({
+                        ok: true,
+                        message: 'Se ha subido correctamente v2',
+                        detalles: {
+                            name: archivoEjemplo.name,
+                            extension: archivoEjemplo.mimetype
+                        }
+                    });
+                })
+            }
         }
     }
-
-    // // el nombre del input del cual toma el archivo en la pagina web es el nombre en la cual llegada
-    // let archivoEjemplo = req.files.archivo;
-
-
 });
 
 module.exports = app

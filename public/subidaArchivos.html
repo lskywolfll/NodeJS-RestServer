@@ -13,6 +13,9 @@
         <br /><br />
         <input type="submit" />
     </form>
+    <div>
+        <ul id="listaDeArchivos"></ul>
+    </div>
     <script>
         // Example POST method implementation:
         async function postData(url = '', data = {}) {
@@ -23,7 +26,7 @@
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
                 credentials: 'same-origin', // include, *same-origin, omit
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
                     // 'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 redirect: 'follow', // manual, *follow, error
@@ -52,16 +55,34 @@
 
         const uploadForm = document.querySelector('.upload');
         uploadForm.addEventListener('submit', function (e) {
-            e.preventDefault()
+            e.preventDefault();
             let file = e.target.uploadFile.files;
             let formData = new FormData();
-            let listaDeArchivos = [];
+            const lista = document.getElementById('listaDeArchivos');
+            lista.innerHTML = ''
+            let comentariosAsociados = [{
+                comentario: 'Pepe',
+                archivosAsociados: []
+            },{
+                comentario: 'Juanito',
+                archivosAsociados: []
+            }];
 
-            Array.from(file).forEach(element => {
-                listaDeArchivos.push(element);
+            Array.from(file).forEach((element,posicion) => {
+                console.log(posicion);
+                // console.log(element);
+                comentariosAsociados[0].archivosAsociados.push(element.name)
+                let li = document.createElement('li');
+                let br = document.createElement('br');
+                li.appendChild(document.createTextNode(`${element.name}`))
+                lista.appendChild(li);
+                lista.appendChild(br)
                 formData.append('archivos', element)
             })
 
+            console.log(comentariosAsociados);
+            formData.append('comentarios', JSON.stringify(comentariosAsociados));
+            formData.append('idUsuario', 1);
             
             fetch('http://localhost:3000/upload', {
                 method: 'POST',
