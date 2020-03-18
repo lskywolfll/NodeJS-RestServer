@@ -8,7 +8,9 @@ const extensionesValidas = ['jpg', 'png', 'pdf', 'jpeg'];
 // Lo convierte todos los archivos qe se suban a req.files (LLegaran siempre a esa propiedad)
 app.use(fileUpload({ useTempFiles: true }));
 
-app.put('/upload', (req, res) => {
+app.post('/upload', (req, res) => {
+
+    console.log(req.files);
 
     if (!req.files) {
         return res.status(400).json({
@@ -18,7 +20,6 @@ app.put('/upload', (req, res) => {
             }
         })
     }
-
 
     if (req.files.archivos.length > 1) {
         // Itero multiples archivos

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subida</title>
+</head>
+
+<body>
+    <form class="upload">
+        <input type="file" name="uploadFile" multiple required />
+        <br /><br />
+        <input type="submit" />
+    </form>
+    <script>
+        // Example POST method implementation:
+        async function postData(url = '', data = {}) {
+            // Default options are marked with *
+            const response = await fetch('http://localhost:3000/' + url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'no-cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *client
+                body: data // body data type must match "Content-Type" header
+            });
+            return await response.json(); // parses JSON response into native JavaScript objects
+        }
+
+        async function sendData(data) {
+            const formData = new FormData();
+
+            for (const name in data) {
+                formData.append('archivos', data[name]);
+            }
+
+            console.log(formData);
+
+            const response = await fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            return await response.json();
+        }
+
+        const uploadForm = document.querySelector('.upload');
+        uploadForm.addEventListener('submit', function (e) {
+            e.preventDefault()
+            let file = e.target.uploadFile.files;
+            let formData = new FormData();
+            let listaDeArchivos = [];
+
+            Array.from(file).forEach(element => {
+                listaDeArchivos.push(element);
+                formData.append('archivos', element)
+            })
+
+            
+            fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.errors) {
+                        alert(data.errors)
+                    }
+                    else {
+                        console.log(data)
+                    }
+                })
+        });
+    </script>
+</body>
+
+</html>

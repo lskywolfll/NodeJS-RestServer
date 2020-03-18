@@ -5,7 +5,7 @@ const db = require('./config/db');
 const path = require('path');
 const app = express();
 const bodyParser = require('body-parser');
-// const cors = require('cors')
+const cors = require('cors')
 
 // Configuraciones del server
 const config = require('./config/config');
@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 // resolve => soluciona el tema para que la ruta sea valida independiente de los argumentos que tengas
 app.use(express.static(path.resolve(__dirname , '../public')));
 
-// app.use(cors);
+app.use(cors());
 
 // Routes
 app.use(require('./routes/index'));
