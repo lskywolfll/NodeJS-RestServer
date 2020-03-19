@@ -4,99 +4,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/archivos.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script> -->
     <title>Subida</title>
 </head>
 
 <body>
     <form class="upload">
-        <input type="file" name="uploadFile" multiple required />
+        <input type="file" name="uploadFile" id="archivo" multiple required />
         <br /><br />
         <input type="submit" />
     </form>
-    <div>
-        <ul id="listaDeArchivos"></ul>
+    <!-- Izquierda -->
+    <div style="width: 30%;">
+        <div class="row">
+            <div class="col-2">
+                <img src="./icon_noselect_azul.png" alt="">
+            </div>
+            <div class="col-10">
+                <ul id="listaDeArchivos"></ul>
+            </div>
+            <div class="col-2 text-center">
+                <span class="linea"></span>
+            </div>
+
+        </div>
     </div>
+    <!-- Derecha -->
+
     <script>
-        // Example POST method implementation:
-        async function postData(url = '', data = {}) {
-            // Default options are marked with *
-            const response = await fetch('http://localhost:3000/' + url, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                mode: 'no-cors', // no-cors, *cors, same-origin
-                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: 'same-origin', // include, *same-origin, omit
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                redirect: 'follow', // manual, *follow, error
-                referrerPolicy: 'no-referrer', // no-referrer, *client
-                body: data // body data type must match "Content-Type" header
-            });
-            return await response.json(); // parses JSON response into native JavaScript objects
+        let listaIngresados = [];
+        let formData = new FormData();
+        const lista = document.getElementById('listaDeArchivos');
+
+        let comentariosAsociados = [{
+            comentario: 'Pepe',
+            archivosAsociados: []
+        }, {
+            comentario: 'Juanito',
+            archivosAsociados: []
+        }];
+
+        function crearItemEnLista(nombre) {
+            // Creacion de los elementos
+            let li = document.createElement('li');
+            let br = document.createElement('br');
+            let deleting = document.createElement('span');
+            deleting.setAttribute('class', 'close')
+            // deleting.appendChild(document.createTextNode('x'))
+            deleting.onclick = deleteItem;
+            // Insertar contenido en el elemento
+            li.appendChild(document.createTextNode(nombre))
+            li.setAttribute('nombre', nombre);
+            li.appendChild(deleting);
+            // Insertar en la lista de los elementos
+            lista.appendChild(li);
+            lista.appendChild(br);
         }
 
-        async function sendData(data) {
-            const formData = new FormData();
+        function deleteItem(e) {
+            let nombre = e.path[1].attributes[0].textContent;
+            // console.log("borraremos el: " + nombre);
 
-            for (const name in data) {
-                formData.append('archivos', data[name]);
-            }
+            let data = formData.getAll('archivos');
+            let posicion = data.findIndex(x => x.name === nombre);
+            data.splice(posicion, 1);
 
-            console.log(formData);
-
-            const response = await fetch('http://localhost:3000/upload', {
-                method: 'POST',
-                body: formData
+            console.log(nombre);
+            listaIngresados.splice(nombre, 1);
+            console.log(listaIngresados);
+            // Se limpia ya que formdata en si no tiene una forma para eliminar especificamente dentro de un array solo elimina todo lo que contenga la llave(key(Palabra Clave:valor))
+            formData.delete('archivos');
+            lista.innerHTML = '';
+            // Preferiblemente que se haga apilacion automatica por que se queda estructura de forma distinta al inicial cuando se van ingresando archivos
+            data.forEach(archivo => {
+                crearItemEnLista(archivo.name);
+                formData.append('archivos', archivo);
             });
 
-            return await response.json();
+            console.log(formData.getAll('archivos'));
         }
 
+        const archivo = document.querySelector('#archivo');
         const uploadForm = document.querySelector('.upload');
-        uploadForm.addEventListener('submit', function (e) {
+        archivo.addEventListener('change', function (e) {
             e.preventDefault();
-            let file = e.target.uploadFile.files;
-            let formData = new FormData();
-            const lista = document.getElementById('listaDeArchivos');
-            lista.innerHTML = ''
-            let comentariosAsociados = [{
-                comentario: 'Pepe',
-                archivosAsociados: []
-            },{
-                comentario: 'Juanito',
-                archivosAsociados: []
-            }];
+            let files = e.target.files;
+            console.log('llegue');
+            // Se creara siempre de denuevo al hacer click al boton submit y no dejara registros
 
-            Array.from(file).forEach((element,posicion) => {
-                console.log(posicion);
-                // console.log(element);
-                comentariosAsociados[0].archivosAsociados.push(element.name)
-                let li = document.createElement('li');
-                let br = document.createElement('br');
-                li.appendChild(document.createTextNode(`${element.name}`))
-                lista.appendChild(li);
-                lista.appendChild(br)
-                formData.append('archivos', element)
-            })
+            // Esto limpia la lista cada vez que nosotros insertamos nuevos archivos lo cual no deberia ser asi cuando se siga el diseño
+            // Esto no debe limpiarse 
+            // pero se debe validar el ingreso de archivos duplicados con la misma extension y nombre unicamente y si uno es distinto que pase
 
-            console.log(comentariosAsociados);
+            Array.from(files).forEach(element => {
+                // Valida si existe y si no existe entonces se crea, los que fueron creados no pueden volver a ingresarse
+                if (listaIngresados.indexOf(element.name) < 0) {
+                    // Comentarios
+                    comentariosAsociados[0].archivosAsociados.push(element.name)
+                    listaIngresados.push(element.name);
+                    crearItemEnLista(element.name)
+                    // Insertar el archivo para el backend
+                    formData.append('archivos', element);
+                } else {
+                    console.log('alerta');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Ya has ingresado un archivo con este nombre'
+                    })
+                }
+
+            });
+
+            archivo.value = ''
+
+            // Comentarios para enviarselo al back para que cree los archivos
             formData.append('comentarios', JSON.stringify(comentariosAsociados));
             formData.append('idUsuario', 1);
-            
-            fetch('http://localhost:3000/upload', {
-                method: 'POST',
-                body: formData
-            })
-                .then(resp => resp.json())
-                .then(data => {
-                    if (data.errors) {
-                        alert(data.errors)
-                    }
-                    else {
-                        console.log(data)
-                    }
-                })
+
+            console.log(comentariosAsociados);
+            // Con esto obtenemos todos los archivos en formato array
+            // console.log(formData.getAll('archivos'));
+
+            // fetch('http://localhost:3000/upload', {
+            //     method: 'POST',
+            //     body: formData
+            // })
+            //     .then(resp => resp.json())
+            //     .then(data => {
+            //         if (data.errors) {
+            //             alert(data.errors)
+            //         }
+            //         else {
+            //             console.log(data)
+            //         }
+            //     })
         });
     </script>
 </body>
