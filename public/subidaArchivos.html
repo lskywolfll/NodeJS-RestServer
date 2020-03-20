@@ -19,7 +19,7 @@
     </form>
     <button onclick="enviarDatos()">Subir</button>
     <!-- Izquierda -->
-    <div style="width: 30%;">
+    <div id="contenedorDeLosComentarios" style="width: 30%;">
         <div class="row">
             <div class="col-2">
                 <img src="./icon_noselect_azul.png" class="circulo" alt="">
@@ -28,14 +28,102 @@
             </div>
             <div class="col-10">
                 <ul id="listaDeArchivos"></ul>
+                <a id="hide1" href="#hide1" class="hide comentario">+ COMENTARIOS</a>
+                <a id="show1" href="#show1" class="show comentario">- COMENTARIOS</a>
+                <textarea name="" class="comentario__txtarea"></textarea>
             </div>
         </div>
     </div>
 
     <script>
+        let numeroComentario = 0;
+        function crearConjunto(contenedor) {
+            // Creacion de los elementos
+            let container = document.createElement('div');
+            container.setAttribute('class', 'row');
+
+            crearFiguras(container);
+            crearListaConComentario(container);
+
+            contenedor.appendChild(container);
+            console.log('se creo');
+        }
+
+        function crearFiguras(padre) {
+            const imageCirculo = './icon_noselect_azul.png';
+            const imageFlecha = "./noun_Angle Down_1965560.png"
+
+            let contenedor = document.createElement('div');
+            contenedor.setAttribute('class', 'col-2');
+            
+            let circulo = document.createElement('img');
+            circulo.setAttribute('src', imageCirculo);
+            circulo.setAttribute('class', 'circulo');
+
+            let linea = document.createElement('div');
+            linea.setAttribute('class', 'linea');
+
+            let flecha = document.createElement('img');
+            flecha.setAttribute('src', imageFlecha);
+            flecha.setAttribute('class', 'flecha');
+
+            contenedor.appendChild(circulo);
+            contenedor.appendChild(linea);
+            contenedor.appendChild(flecha);
+
+            padre.appendChild(contenedor);
+        }
+
+        function crearListaConComentario(padre) {
+
+            numeroComentario++
+
+            let contenedor = document.createElement('div');
+            contenedor.setAttribute('class', 'col-10');
+
+            let listaContenedor = document.createElement('ul');
+            listaContenedor.setAttribute('id', 'listaDeArchivos');
+            
+            let ocultarComentario = document.createElement('a');
+            ocultarComentario.setAttribute('id', `hide${numeroComentario}`);
+            ocultarComentario.setAttribute('href', `#hide${numeroComentario}`);
+            ocultarComentario   .setAttribute('class', 'hide comentario');
+
+            let mostrarComentario = document.createElement('a');
+            mostrarComentario.setAttribute('id', `show${numeroComentario}`);
+            mostrarComentario.setAttribute('href', `#show${numeroComentario}`);
+            mostrarComentario.setAttribute('class', 'show comentario');
+            
+            let comentario = document.createElement('textarea');
+            comentario.setAttribute('name', '');
+            comentario.setAttribute('class', 'comentario__txtarea')
+
+            contenedor.appendChild(listaContenedor);
+            contenedor.appendChild(ocultarComentario);
+            contenedor.appendChild(mostrarComentario);
+            contenedor.appendChild(comentario);
+
+            padre.appendChild(contenedor);
+        }
+
         let listaIngresados = [];
         let formData = new FormData();
         const lista = document.getElementById('listaDeArchivos');
+        let comentariosTxt = document.querySelectorAll('.comentario__txtarea');
+
+        let contenedorDeTodo = document.getElementById('contenedorDeLosComentarios');
+        crearConjunto(contenedorDeTodo);
+
+        comentariosTxt.forEach(elemento => {
+            elemento.addEventListener('change', (e) => {
+                const valor = e.target.value;
+                
+                elemento.setAttribute('name', valor);
+                
+                console.log(`valor del name en el input especifico es: ${e.target.name}`);
+                
+            })
+        });
 
         let comentariosAsociados = [{
             comentario: 'Pepe',
@@ -50,10 +138,9 @@
             let li = document.createElement('li');
             let br = document.createElement('br');
             let deleting = document.createElement('span');
-            deleting.setAttribute('class', 'close')
-            // deleting.appendChild(document.createTextNode('x'))
-            deleting.onclick = deleteItem;
             // Insertar contenido en el elemento
+            deleting.setAttribute('class', 'close');
+            deleting.onclick = deleteItem;
             li.appendChild(document.createTextNode(nombre))
             li.setAttribute('nombre', nombre);
             li.appendChild(deleting);
@@ -64,15 +151,11 @@
 
         function deleteItem(e) {
             let nombre = e.path[1].attributes[0].textContent;
-            // console.log("borraremos el: " + nombre);
-
             let data = formData.getAll('archivos');
             let posicion = data.findIndex(x => x.name === nombre);
-            data.splice(posicion, 1);
 
-            console.log(nombre);
+            data.splice(posicion, 1);
             listaIngresados.splice(nombre, 1);
-            console.log(listaIngresados);
             // Se limpia ya que formdata en si no tiene una forma para eliminar especificamente dentro de un array solo elimina todo lo que contenga la llave(key(Palabra Clave:valor))
             formData.delete('archivos');
             lista.innerHTML = '';
@@ -81,12 +164,10 @@
                 crearItemEnLista(archivo.name);
                 formData.append('archivos', archivo);
             });
-
-            console.log(formData.getAll('archivos'));
         }
 
         const archivo = document.querySelector('#archivo');
-        const uploadForm = document.querySelector('.upload');
+        // Se tiene que validar que cuando se suba algun archivo, este verifique si ya se puso algun comentario verirficando si algun input tiene un name para poder dejarlo en la lista respectiva y por consiguiente agregarla a su list, todo el resto sigue tal cual como esta funcionando actualmente
         archivo.addEventListener('change', function (e) {
             e.preventDefault();
             let files = e.target.files;
@@ -126,7 +207,7 @@
             console.log(comentariosAsociados);
         });
 
-        function enviarDatos(){
+        function enviarDatos() {
             fetch('http://localhost:3000/upload', {
                 method: 'POST',
                 body: formData

@@ -37,12 +37,12 @@ ul li {
     cursor: pointer;
 }
 
-.circulo{
+.circulo {
     padding: 5px;
     width: 40px;
 }
 
-.flecha{
+.flecha {
     height: auto;
     margin-top: -25px;
     padding-left: 13px;
@@ -70,4 +70,45 @@ ul li {
     border-radius: 50%;
     transform: scale(0.04);
     background: #09f;
+}
+
+.comentario__txtarea {
+    margin: 0px;
+    height: 83px;
+    width: 323px;
+}
+
+.comentario {
+    color: #244353;
+    text-decoration: none !important;
+}
+
+.comentario:hover {
+    color: #244353;
+}
+
+
+#listaDeArchivos {
+    margin-top: 2%;
+    padding: inherit;
+}
+
+/* Comentarios Ocultar */
+/* Animacion para efecto de entrada */
+@keyFrames fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.comentario__txtarea, .show, .hide:target {
+    display: none;
+}
+
+.hide:target+.show, .hide:target~.comentario__txtarea {
+    display: block;
+    animation: fadein 1s;
 }
