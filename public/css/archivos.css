@@ -112,3 +112,7 @@ ul li {
     display: block;
     animation: fadein 1s;
 }
+
+.experiment{
+    margin-bottom: 10%;
+}

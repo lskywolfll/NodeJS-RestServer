@@ -21,7 +21,7 @@
     <!-- Izquierda -->
     <div id="contenedorDeLosComentarios" style="width: 30%;">
         <div class="row">
-            <div class="col-2">
+            <div class="col-2 experiment">
                 <img src="./icon_noselect_azul.png" class="circulo" alt="">
                 <div class="linea"></div>
                 <img src="./noun_Angle Down_1965560.png" class="flecha" alt="">
@@ -36,7 +36,7 @@
     </div>
 
     <script>
-        let numeroComentario = 0;
+        let numeroComentario = 1;
         function crearConjunto(contenedor) {
             // Creacion de los elementos
             let container = document.createElement('div');
@@ -87,16 +87,20 @@
             let ocultarComentario = document.createElement('a');
             ocultarComentario.setAttribute('id', `hide${numeroComentario}`);
             ocultarComentario.setAttribute('href', `#hide${numeroComentario}`);
-            ocultarComentario   .setAttribute('class', 'hide comentario');
+            ocultarComentario.setAttribute('class', 'hide comentario');
+            ocultarComentario.appendChild(document.createTextNode('+ COMENTARIOS'));
 
             let mostrarComentario = document.createElement('a');
             mostrarComentario.setAttribute('id', `show${numeroComentario}`);
             mostrarComentario.setAttribute('href', `#show${numeroComentario}`);
             mostrarComentario.setAttribute('class', 'show comentario');
+            mostrarComentario.appendChild(document.createTextNode('- COMENTARIOS'));
             
             let comentario = document.createElement('textarea');
             comentario.setAttribute('name', '');
-            comentario.setAttribute('class', 'comentario__txtarea')
+            comentario.setAttribute('class', 'comentario__txtarea');
+
+            console.log(comentario);
 
             contenedor.appendChild(listaContenedor);
             contenedor.appendChild(ocultarComentario);
