@@ -41,6 +41,12 @@ app.post('/upload', (req, res) => {
 
     let carpetaDestino = path.join(__dirname.split('server')[0] + `uploads/usuarios/${nombreFalse}`);
 
+    fs.mkdirSync(carpetaDestino, { recursive: true }, (err) => {
+        if (err) throw err;
+
+        console.log('se ha creado exitosamente');
+    });
+
     if (req.files.archivos.length > 1) {
         // Itero multiples archivos
         req.files.archivos.forEach(archivo => {
@@ -55,35 +61,55 @@ app.post('/upload', (req, res) => {
                 });
             }
 
-            fs.mkdirSync(carpetaDestino, { recursive: true }, (err) => {
-                if (err) throw err;
+            if (tieneComentarios) {
+                req.body.comentarios.forEach(element => {
+                    if (element.comentario) {
+                        let ubicacionArchivo = carpetaDestino + `/${element.comentario}`;
+                        fs.mkdirSync(ubicacionArchivo, { recursive: true }, (err) => {
+                            if (err) throw err;
 
-                console.log('se ha creado exitosamente');
-            });
+                            console.log('Se creo correctamente');
+                        });
 
-            archivo.mv(`${carpetaDestino}/${archivo.name}`, (err) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        err
-                    });
-                }
-            })
+                        element.archivosAsociados.forEach(nombres => {
+                            if (nombres == archivo.name) {
+                                archivo.mv(`${ubicacionArchivo}/${archivo.name}`, (err) => {
+                                    if (err) {
+                                        return res.status(500).json({
+                                            ok: false,
+                                            err
+                                        });
+                                    }
+
+                                    console.log('paso');
+                                })
+                            }
+                        });
+                    }
+                });
+            } else {
+                archivo.mv(`${carpetaDestino}/${archivo.name}`, (err) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            err
+                        });
+                    }
+                })
+            }
         });
 
-        fs.rmdir(carpetaDestino, { recursive: true }, (err) => {
-            if (err) throw err;
+        // fs.rmdir(carpetaDestino, { recursive: true }, (err) => {
+        //     if (err) throw err;
 
-            console.log('Se elimino la carpeta correctamente');
-        })
+        //     console.log('Se ha eliminado exitosamente');
+        // });
 
         return res.status(200).json({
             ok: true,
             message: 'Se ha subido correctamente',
             archivos: req.files.archivos
         });
-
-
     } else {
         let archivoEjemplo = req.files.archivos;
 
@@ -104,11 +130,10 @@ app.post('/upload', (req, res) => {
                     // console.log(element);
                     if (element.comentario) {
                         let ubicacionArchivo = carpetaDestino + `/${element.comentario}`
-                        console.log(ubicacionArchivo);
                         fs.mkdirSync(ubicacionArchivo, { recursive: true }, (err) => {
                             if (err) throw err;
 
-                           console.log('Se creo correctamente');
+                            console.log('Se creo correctamente');
                         })
 
                         element.archivosAsociados.forEach(nombres => {

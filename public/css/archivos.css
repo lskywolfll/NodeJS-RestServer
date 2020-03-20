@@ -2,6 +2,7 @@ ul li {
     position: relative;
     list-style-type: decimal;
 }
+
 /* 
 .close {
     position: absolute;
@@ -27,12 +28,35 @@ ul li {
     cursor: pointer;
 }
 
-.linea:after{
+.linea::after {
     content: '|';
-    font-size: 1em;
+    font-size: 4px;
+    min-height: 100%;
     color: #07fdfa;
     margin-left: 100%;
     cursor: pointer;
+}
+
+.circulo{
+    padding: 5px;
+    width: 40px;
+}
+
+.flecha{
+    height: auto;
+    margin-top: -25px;
+    padding-left: 13px;
+    padding-right: 15px;
+    width: 40px;
+}
+
+.linea {
+    border-left: 1.1px solid #b6d6d9;
+    border-right: 1.1px solid #81b8be;
+    margin: 0 18px;
+    padding: 0;
+    width: 0px;
+    min-height: 100%;
 }
 
 .circle {

@@ -16,24 +16,21 @@
     <form class="upload">
         <input type="file" name="uploadFile" id="archivo" multiple required />
         <br /><br />
-        <input type="submit" />
     </form>
+    <button onclick="enviarDatos()">Subir</button>
     <!-- Izquierda -->
     <div style="width: 30%;">
         <div class="row">
             <div class="col-2">
-                <img src="./icon_noselect_azul.png" alt="">
+                <img src="./icon_noselect_azul.png" class="circulo" alt="">
+                <div class="linea"></div>
+                <img src="./noun_Angle Down_1965560.png" class="flecha" alt="">
             </div>
             <div class="col-10">
                 <ul id="listaDeArchivos"></ul>
             </div>
-            <div class="col-2 text-center">
-                <span class="linea"></span>
-            </div>
-
         </div>
     </div>
-    <!-- Derecha -->
 
     <script>
         let listaIngresados = [];
@@ -127,23 +124,23 @@
             formData.append('idUsuario', 1);
 
             console.log(comentariosAsociados);
-            // Con esto obtenemos todos los archivos en formato array
-            // console.log(formData.getAll('archivos'));
-
-            // fetch('http://localhost:3000/upload', {
-            //     method: 'POST',
-            //     body: formData
-            // })
-            //     .then(resp => resp.json())
-            //     .then(data => {
-            //         if (data.errors) {
-            //             alert(data.errors)
-            //         }
-            //         else {
-            //             console.log(data)
-            //         }
-            //     })
         });
+
+        function enviarDatos(){
+            fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.errors) {
+                        alert(data.errors)
+                    }
+                    else {
+                        console.log(data)
+                    }
+                })
+        }
     </script>
 </body>
 
