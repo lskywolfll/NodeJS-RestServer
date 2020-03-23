@@ -16,7 +16,7 @@ app.post('/upload', (req, res) => {
     let tieneComentarios = false;
 
     // console.log(req.files);
-    console.log(req.body);
+    // console.log(req.body);
 
     if (req.body.comentarios && req.body.comentarios != 'null' && req.body.comentarios != null) {
         tieneComentarios = true;
@@ -41,11 +41,22 @@ app.post('/upload', (req, res) => {
 
     let carpetaDestino = path.join(__dirname.split('server')[0] + `uploads/usuarios/${nombreFalse}`);
 
+    let estadoCarpeta = fs.existsSync(carpetaDestino);
+
+    if (estadoCarpeta) {
+        fs.rmdirSync(carpetaDestino, { recursive: true }, (err) => {
+            if (err) throw err;
+
+            console.log('Se ha eliminado exitosamente');
+        });
+    }
+    
     fs.mkdirSync(carpetaDestino, { recursive: true }, (err) => {
         if (err) throw err;
 
         console.log('se ha creado exitosamente');
     });
+
 
     if (req.files.archivos.length > 1) {
         // Itero multiples archivos
@@ -74,15 +85,10 @@ app.post('/upload', (req, res) => {
                         element.archivosAsociados.forEach(nombres => {
                             if (nombres == archivo.name) {
                                 archivo.mv(`${ubicacionArchivo}/${archivo.name}`, (err) => {
-                                    if (err) {
-                                        return res.status(500).json({
-                                            ok: false,
-                                            err
-                                        });
-                                    }
+                                    if (err) throw err;
 
                                     console.log('paso');
-                                })
+                                });
                             }
                         });
                     }
@@ -98,12 +104,6 @@ app.post('/upload', (req, res) => {
                 })
             }
         });
-
-        // fs.rmdir(carpetaDestino, { recursive: true }, (err) => {
-        //     if (err) throw err;
-
-        //     console.log('Se ha eliminado exitosamente');
-        // });
 
         return res.status(200).json({
             ok: true,

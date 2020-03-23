@@ -14,29 +14,51 @@
 
 <body>
     <form class="upload">
-        <input type="file" name="uploadFile" id="archivo" multiple required />
+        <input type="file" name="uploadFile" id="archivo" hidden multiple required />
         <br /><br />
     </form>
     <button onclick="enviarDatos()">Subir</button>
     <!-- Izquierda -->
-    <div id="contenedorDeLosComentarios" style="width: 30%;">
+
+    <div id="contenedorDeLosComentarios" style="width: 40%;">
         <div class="row">
-            <div class="col-2 experiment">
+            <div class="col-1 experiment">
                 <img src="./icon_noselect_azul.png" class="circulo" alt="">
                 <div class="linea"></div>
                 <img src="./noun_Angle Down_1965560.png" class="flecha" alt="">
             </div>
-            <div class="col-10">
-                <ul id="listaDeArchivos"></ul>
-                <a id="hide1" href="#hide1" class="hide comentario">+ COMENTARIOS</a>
-                <a id="show1" href="#show1" class="show comentario">- COMENTARIOS</a>
-                <textarea name="" class="comentario__txtarea"></textarea>
+            <div class="col-11">
+                <button class="adjuntar__archivo" onclick="pedirArchivo()">Adjuntar Archivo</button>
+                <ul class="listaDeArchivos"></ul>
+                <a id="hide1" href="#hide1" class="hide comentario" onclick="mostrarComentarios(event)">+ COMENTARIOS</a>
+                <a id="show1" href="#show1" class="show comentario" onclick="ocultarComentarios(event)">- COMENTARIOS</a>
+                <textarea name="" class="comentario__txtarea" position="0"
+                    onchange="siguienteComentario(event)"></textarea>
             </div>
         </div>
     </div>
 
     <script>
         let numeroComentario = 1;
+        let posicion = 0;
+        let cantidadComentarios = 0;
+        let posicionContadorComentario = 0;
+        // Variables
+        let listaIngresados = [];
+        let formData = new FormData();
+        let comentariosTxt = document.querySelectorAll('.comentario__txtarea');
+        let contenedorDeTodo = document.getElementById('contenedorDeLosComentarios');
+        crearConjunto(contenedorDeTodo);
+
+        // comentario: 'Pepe',
+        // archivosAsociados: []
+        let comentariosAsociados = [];
+
+        function pedirArchivo() {
+            const inputFile = document.getElementById('archivo');
+            inputFile.click();
+        }
+
         function crearConjunto(contenedor) {
             // Creacion de los elementos
             let container = document.createElement('div');
@@ -54,8 +76,8 @@
             const imageFlecha = "./noun_Angle Down_1965560.png"
 
             let contenedor = document.createElement('div');
-            contenedor.setAttribute('class', 'col-2');
-            
+            contenedor.setAttribute('class', 'col-1');
+
             let circulo = document.createElement('img');
             circulo.setAttribute('src', imageCirculo);
             circulo.setAttribute('class', 'circulo');
@@ -75,32 +97,35 @@
         }
 
         function crearListaConComentario(padre) {
-
+            // Valores dinamicos
             numeroComentario++
+            posicionContadorComentario++
 
             let contenedor = document.createElement('div');
-            contenedor.setAttribute('class', 'col-10');
+            contenedor.setAttribute('class', 'col-11');
 
             let listaContenedor = document.createElement('ul');
-            listaContenedor.setAttribute('id', 'listaDeArchivos');
-            
+            listaContenedor.setAttribute('class', 'listaDeArchivos')
+
             let ocultarComentario = document.createElement('a');
             ocultarComentario.setAttribute('id', `hide${numeroComentario}`);
             ocultarComentario.setAttribute('href', `#hide${numeroComentario}`);
             ocultarComentario.setAttribute('class', 'hide comentario');
             ocultarComentario.appendChild(document.createTextNode('+ COMENTARIOS'));
+            ocultarComentario.onclick = mostrarComentarios;
 
             let mostrarComentario = document.createElement('a');
             mostrarComentario.setAttribute('id', `show${numeroComentario}`);
             mostrarComentario.setAttribute('href', `#show${numeroComentario}`);
             mostrarComentario.setAttribute('class', 'show comentario');
             mostrarComentario.appendChild(document.createTextNode('- COMENTARIOS'));
-            
+            mostrarComentario.onclick = ocultarComentarios;
+
             let comentario = document.createElement('textarea');
             comentario.setAttribute('name', '');
             comentario.setAttribute('class', 'comentario__txtarea');
-
-            console.log(comentario);
+            comentario.setAttribute('position', posicionContadorComentario);
+            comentario.onchange = siguienteComentario;
 
             contenedor.appendChild(listaContenedor);
             contenedor.appendChild(ocultarComentario);
@@ -110,43 +135,94 @@
             padre.appendChild(contenedor);
         }
 
-        let listaIngresados = [];
-        let formData = new FormData();
-        const lista = document.getElementById('listaDeArchivos');
-        let comentariosTxt = document.querySelectorAll('.comentario__txtarea');
+        function ocultarComentarios(e) {
+            let valorTextArea = e.toElement.nextElementSibling.value;
+            let posicionTextArea = e.path[1].lastElementChild.attributes[2].value;
 
-        let contenedorDeTodo = document.getElementById('contenedorDeLosComentarios');
-        crearConjunto(contenedorDeTodo);
+            // Eliminacion de datos
+            comentariosAsociados.splice(valorTextArea, 1);
+            e.toElement.nextElementSibling.value = '';
+            // Se reestablece la posicion inicial al comentario vacio
+            console.log(`
+                posicion: ${posicion}
 
-        comentariosTxt.forEach(elemento => {
-            elemento.addEventListener('change', (e) => {
-                const valor = e.target.value;
-                
-                elemento.setAttribute('name', valor);
-                
-                console.log(`valor del name en el input especifico es: ${e.target.name}`);
-                
-            })
-        });
+                posicionDelInputTextArea: ${posicionTextArea}
+            `);
+            posicion = posicionTextArea
 
-        let comentariosAsociados = [{
-            comentario: 'Pepe',
-            archivosAsociados: []
-        }, {
-            comentario: 'Juanito',
-            archivosAsociados: []
-        }];
+            console.log(`Posicion final: ${posicion}`);
+            console.log(e);
+        }
+
+        function mostrarComentarios(e) {
+            let valorTextArea = e.toElement.nextElementSibling.nextElementSibling.value;
+            console.log('Pase por mostrar');
+            console.log(valorTextArea);
+        }
+
+        function siguienteComentario(e) {
+            cantidadComentario();
+            let valor = e.target.value;
+            let archivosAgregados = e.path[1].children[0].children;
+            let nombresArchivos = [];
+            let listaArchivosSubidos = formData.getAll('archivos');
+            let position = e.target.attributes[2].value;
+
+            for (let i = 0; i < archivosAgregados.length; i++) {
+                if (e.path[1].children[0].children[i].tagName === 'LI') {
+                    if (e.path[1].children[0].children[i].innerText != '') {
+                        let nombre = e.path[1].children[0].children[i].innerText;
+
+                        nombresArchivos.push(nombre);
+                    }
+                }
+            }
+
+            if (valor != '') {
+                const comentario = {
+                    comentario: valor,
+                    archivosAsociados: []
+                };
+
+                nombresArchivos.forEach(nombreArchivo => {
+                    listaArchivosSubidos.forEach(archivo => {
+                        if (archivo.name == nombreArchivo) {
+                            comentario.archivosAsociados.push(nombreArchivo);
+                        }
+                    });
+                });
+
+                comentariosAsociados.push(comentario);
+                let proximaPosicion = posicion;
+
+                if (proximaPosicion + 1 <= cantidadComentarios) {
+                    posicion++;
+                }
+
+                console.log('se creo un comentario');
+            }
+        }
+
+        function cantidadComentario() {
+            cantidadComentarios = 0;
+            comentariosTxt.forEach(elemento => {
+                cantidadComentarios++;
+            });
+        }
 
         function crearItemEnLista(nombre) {
+            let lista = document.querySelectorAll('.listaDeArchivos')[posicion];
+            console.log(`posicion final: ${posicion}`);
             // Creacion de los elementos
             let li = document.createElement('li');
             let br = document.createElement('br');
             let deleting = document.createElement('span');
             // Insertar contenido en el elemento
-            deleting.setAttribute('class', 'close');
+            deleting.setAttribute('class', 'closing');
             deleting.onclick = deleteItem;
             li.appendChild(document.createTextNode(nombre))
             li.setAttribute('nombre', nombre);
+            li.setAttribute('class', 'list__item');
             li.appendChild(deleting);
             // Insertar en la lista de los elementos
             lista.appendChild(li);
@@ -186,13 +262,11 @@
                 // Valida si existe y si no existe entonces se crea, los que fueron creados no pueden volver a ingresarse
                 if (listaIngresados.indexOf(element.name) < 0) {
                     // Comentarios
-                    comentariosAsociados[0].archivosAsociados.push(element.name)
                     listaIngresados.push(element.name);
                     crearItemEnLista(element.name)
                     // Insertar el archivo para el backend
                     formData.append('archivos', element);
                 } else {
-                    console.log('alerta');
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -203,15 +277,17 @@
             });
 
             archivo.value = ''
+        });
 
+        function enviarDatos() {
+            console.log(comentariosAsociados);
+            formData.delete('comentarios');
+            formData.delete('idUsuario');
             // Comentarios para enviarselo al back para que cree los archivos
             formData.append('comentarios', JSON.stringify(comentariosAsociados));
             formData.append('idUsuario', 1);
 
-            console.log(comentariosAsociados);
-        });
 
-        function enviarDatos() {
             fetch('http://localhost:3000/upload', {
                 method: 'POST',
                 body: formData

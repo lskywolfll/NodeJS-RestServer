@@ -3,16 +3,6 @@ ul li {
     list-style-type: decimal;
 }
 
-/* 
-.close {
-    position: absolute;
-    top: 50%;
-    left: 16%;
-    padding: 2px 8px;
-    padding-bottom: 4px;
-    transform: translate(0%, -42%);
-} */
-
 .test {
     height: 17px;
     width: 7px;
@@ -20,7 +10,14 @@ ul li {
     display: inline-block;
 }
 
-.close:after {
+.closing {
+    margin-top: -0% !important;
+    float: right !important;
+    font-size: 17px;
+    opacity: .5 !important;
+}
+
+.closing:after {
     content: "X";
     font-size: 1em;
     color: #07fdfa;
@@ -76,6 +73,22 @@ ul li {
     margin: 0px;
     height: 83px;
     width: 323px;
+    margin-bottom: 20px;
+}
+
+.adjuntar__archivo {
+    margin-left: 66%;
+    color: white;
+    font-size: 13px;
+    background-color: #0f7099;
+    border-radius: 2px;
+    text-decoration: none;
+    border: thin;
+}
+
+.list__item {
+    width: 60%;
+    font-size: 13px;
 }
 
 .comentario {
@@ -87,14 +100,15 @@ ul li {
     color: #244353;
 }
 
-
-#listaDeArchivos {
+.listaDeArchivos {
     margin-top: 2%;
     padding: inherit;
 }
 
 /* Comentarios Ocultar */
+
 /* Animacion para efecto de entrada */
+
 @keyFrames fadein {
     from {
         opacity: 0;
@@ -113,6 +127,6 @@ ul li {
     animation: fadein 1s;
 }
 
-.experiment{
+.experiment {
     margin-bottom: 10%;
 }
