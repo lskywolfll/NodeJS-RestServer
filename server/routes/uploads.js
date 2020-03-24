@@ -42,14 +42,6 @@ app.post('/upload', (req, res) => {
     let carpetaDestino = path.join(__dirname.split('server')[0] + `uploads/usuarios/${nombreFalse}`);
 
     let estadoCarpeta = fs.existsSync(carpetaDestino);
-
-    if (estadoCarpeta) {
-        fs.rmdirSync(carpetaDestino, { recursive: true }, (err) => {
-            if (err) throw err;
-
-            console.log('Se ha eliminado exitosamente');
-        });
-    }
     
     fs.mkdirSync(carpetaDestino, { recursive: true }, (err) => {
         if (err) throw err;

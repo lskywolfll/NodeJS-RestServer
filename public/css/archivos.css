@@ -15,6 +15,7 @@ ul li {
     float: right !important;
     font-size: 17px;
     opacity: .5 !important;
+    margin-right: 8%;
 }
 
 .closing:after {
@@ -77,13 +78,19 @@ ul li {
 }
 
 .adjuntar__archivo {
-    margin-left: 66%;
     color: white;
     font-size: 13px;
+    float: right;
     background-color: #0f7099;
-    border-radius: 2px;
+    border-radius: 5px;
     text-decoration: none;
     border: thin;
+    padding-top: 3px;
+    padding-bottom: 5px;
+}
+
+.adjuntar__archivo:focus {
+    outline: none;
 }
 
 .list__item {
@@ -94,6 +101,10 @@ ul li {
 .comentario {
     color: #244353;
     text-decoration: none !important;
+}
+
+.comentario:focus {
+    outline: none;
 }
 
 .comentario:hover {
@@ -118,15 +129,23 @@ ul li {
     }
 }
 
-.comentario__txtarea, .show, .hide:target {
+/* .comentario__txtarea, .show, .hide:target {
     display: none;
 }
 
 .hide:target+.show, .hide:target~.comentario__txtarea {
     display: block;
     animation: fadein 1s;
+} */
+
+.espaciado {
+    margin-bottom: 10%;
 }
 
-.experiment {
-    margin-bottom: 10%;
+.mostrarComentarios {
+    display: block;
+}
+
+.ocultarComentarios {
+    display: none;
 }
