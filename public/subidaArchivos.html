@@ -39,6 +39,7 @@
     </div>
 
     <script>
+        
         let numeroComentario = 1;
         let posicion = 0;
         let cantidadComentarios = 0;
@@ -50,15 +51,15 @@
         let styleOcultar = 'display: none;'
         let comentariosTxt = document.querySelectorAll('.comentario__txtarea');
         let contenedorDeTodo = document.getElementById('contenedorDeLosComentarios');
-
+        let comentariosAsociados = [];
+        let lista = document.querySelectorAll('.listaDeArchivos')[posicion];
         let objAux = {
             hide: document.getElementById('hide1'),
             show: document.getElementById('show1'),
             comentario: document.querySelector('.comentario__txtarea')
         }
+        
         crearConjunto(contenedorDeTodo);
-
-        let comentariosAsociados = [];
 
         estadoInicial(objAux.hide, objAux.show, objAux.comentario);
 
@@ -278,6 +279,8 @@
             let nombre = e.path[1].attributes[0].textContent;
             let data = formData.getAll('archivos');
             let posicion = data.findIndex(x => x.name === nombre);
+
+            console.log(e);
 
             data.splice(posicion, 1);
             listaIngresados.splice(nombre, 1);

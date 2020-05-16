@@ -59,7 +59,8 @@ app.post('/upload', (req, res) => {
                 return res.status(400).json({
                     ok: false,
                     err: {
-                        message: 'Las extensiones permitidas son: ' + extensionesValidas.join(',')
+                        message: 'Las extensiones permitidas son: ' + extensionesValidas.join(','),
+                        extension: extension
                     }
                 });
             }
