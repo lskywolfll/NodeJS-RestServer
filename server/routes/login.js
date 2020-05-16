@@ -11,7 +11,6 @@ const client = new OAuth2Client(process.env.CLIENT_ID);
 const Usuario = require('../models/usuario');
 
 app.post('/Login', (req, res) => {
-
     const email = req.body.email;
     const password = req.body.password;
 
@@ -19,7 +18,7 @@ app.post('/Login', (req, res) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
         // Si no se encuentra ningun usuario
@@ -27,30 +26,32 @@ app.post('/Login', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'Usuario o contraseña incorrrectos'
-                }
+                    message: 'Usuario o contraseña incorrrectos',
+                },
             });
         }
         // Comparacion de contraseñas con la que encriptada en la base de datos
         if (!bcrypt.compareSync(password, usuarioDB.password)) {
             return res.status(400).json({
                 ok: true,
-                message: 'Usuario o contraseña incorrrectos'
+                message: 'Usuario o contraseña incorrrectos',
             });
         }
-        // Se crear el token en base al objeto que nosotros le indiquemos
-        let token = jwt.sign({
-            usuario: usuarioDB
-        },
-            process.env.SEED
-            , {
-                expiresIn: process.env.CADUCIDAD_TOKEN
-            });
+        // Se crea el token en base al objeto que nosotros le indiquemos
+        const token = jwt.sign(
+            {
+                usuario: usuarioDB,
+            },
+            process.env.SEED,
+            {
+                expiresIn: process.env.CADUCIDAD_TOKEN,
+            },
+        );
 
         res.json({
             ok: true,
             usuario: usuarioDB,
-            token
+            token,
         });
     });
 });
@@ -59,36 +60,34 @@ app.post('/Login', (req, res) => {
 async function verify(token) {
     const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: process.env.CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        audience: process.env.CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
         // Or, if multiple clients access the backend:
         //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });
-    const payload = ticket.getPayload();
+    const { name, email, picture } = ticket.getPayload();
     // Propiedades a retornar con los datos obtenidos a partir del token del usuario
     // Tratando replicar un poco el modelo de nuestro usario para mongodb(schema)
     return {
-        nombre: payload.name,
-        email: payload.email,
-        imageUrl: payload.picture,
-        google: true
-    }
+        nombre: name,
+        email: email,
+        imageUrl: picture,
+        google: true,
+    };
 }
 
 app.post('/google', async (req, res) => {
-
-    const googleUser = await verify(req.body.idtoken)
-        .catch(err => {
-            return res.status(403).json({
-                ok: false,
-                err: err
-            });
+    const googleUser = await verify(req.body.idtoken).catch((err) => {
+        return res.status(403).json({
+            ok: false,
+            err: err,
         });
+    });
 
     Usuario.findOne({ email: googleUser.email }, (err, usuarioDB) => {
         if (err) {
-            returnres.status(500).json({
+            return res.status(500).json({
                 ok: false,
-                err: err
+                err: err,
             });
         }
 
@@ -98,24 +97,25 @@ app.post('/google', async (req, res) => {
                 return res.status(400).json({
                     ok: false,
                     err: {
-                        message: 'Debe de usar su autenticacion normal'
-                    }
+                        message: 'Debe de usar su autenticacion normal',
+                    },
                 });
             } else {
-                let token = jwt.sign({
-                    usuario: usuarioDB
-                },
+                const token = jwt.sign(
+                    {
+                        usuario: usuarioDB,
+                    },
                     process.env.SEEd,
                     {
-                        expiresIn: process.env.CADUCIDAD_TOKEN
-                    }
+                        expiresIn: process.env.CADUCIDAD_TOKEN,
+                    },
                 );
 
                 return res.json({
                     ok: true,
                     usuario: usuarioDB,
-                    token
-                })
+                    token,
+                });
             }
         } else {
             // Si el usuario es la primera vez que ingresa ala pagian web y quiere registrarse por google
@@ -131,23 +131,25 @@ app.post('/google', async (req, res) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        err
+                        err,
                     });
                 }
 
-                let token = jwt.sign({
-                    usuario: usuarioDB
-                },
+                const token = jwt.sign(
+                    {
+                        usuario: usuarioDB,
+                    },
                     process.env.SEEd,
                     {
-                        expiresIn: process.env.CADUCIDAD_TOKEN
-                    });
+                        expiresIn: process.env.CADUCIDAD_TOKEN,
+                    },
+                );
 
                 return res.json({
                     ok: true,
                     usuario: usuarioDB,
-                    token
-                })
+                    token,
+                });
             });
         }
     });

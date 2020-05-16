@@ -9,11 +9,11 @@ const Categoria = require('../models/categorias');
 const { Fecha_Formatear } = require('../Controllers/ControladorDeTiempo');
 
 // Todas Las categorias
-app.get('/categorias',verficarToken, (req, res) => {
+app.get('/categorias', verficarToken, (req, res) => {
     Categoria.find({})
         //Sort para ordenar en base a un campo del esquema del modelo en uso
         .sort('descripcion')
-        // Buscar la informacion de otra tabla(coleccion) y seleccionar ciertos campos 
+        // Buscar la informacion de otra tabla(coleccion) y seleccionar ciertos campos
         //NT: El tipo de propiedad en el esquema usado(modelo) debe ser el tipo object id y dejarle la referencia a la cual estara apuntando y mediante ello hacer el populate
         // populate params
         // 1- coleccion
@@ -23,18 +23,18 @@ app.get('/categorias',verficarToken, (req, res) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    err
+                    err,
                 });
             }
 
             return res.status(200).json({
                 ok: true,
-                categorias
+                categorias,
             });
         });
 });
 // Mostrar una categoria por id
-app.get('/categoria/:id',verficarToken, (req, res) => {
+app.get('/categoria/:id', verficarToken, (req, res) => {
     // Categoria.findById
     const id = req.params.id;
 
@@ -42,27 +42,27 @@ app.get('/categoria/:id',verficarToken, (req, res) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
 
-        if(!categoriaDB){
+        if (!categoriaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'No existe la categoria con el id ingresado'
-                }
+                    message: 'No existe la categoria con el id ingresado',
+                },
             });
         }
 
         return res.status(200).json({
             ok: true,
-            categoria: categoriaDB
+            categoria: categoriaDB,
         });
     });
 });
 // Actualizar una Categoria por id
-app.put('/categoria/:id', verficarToken,(req, res) => {
+app.put('/categoria/:id', verficarToken, (req, res) => {
     const id = req.params.id;
     let body = _.pick(req.body, ['tipo', 'descripcion']);
 
@@ -70,22 +70,22 @@ app.put('/categoria/:id', verficarToken,(req, res) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
 
-        if(!categodiaDB){
+        if (!categodiaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'No existe la categoria con el id ingresado'
-                }
+                    message: 'No existe la categoria con el id ingresado',
+                },
             });
         }
 
         return res.status(200).json({
             ok: true,
-            categoria: categodiaDB
+            categoria: categodiaDB,
         });
     });
 });
@@ -99,34 +99,34 @@ app.post('/categoria', verficarToken, (req, res) => {
         tipo: req.body.tipo,
         descripcion: req.body.descripcion,
         fecha: fecha,
-        usuario: req.usuario._id
+        usuario: req.usuario._id,
     });
 
     categoria.save((err, categoriaDB) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                err
+                err,
             });
         }
 
-        if(!categoriaDB){
+        if (!categoriaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'No se ha podido crear la categoria '
-                }
+                    message: 'No se ha podido crear la categoria ',
+                },
             });
         }
 
         return res.status(200).json({
             ok: true,
-            categoria: categoriaDB
+            categoria: categoriaDB,
         });
     });
 });
 // Eliminar una categoria y que solo pueda borrar un administrador
-app.delete('/categoria/:id', [verficarToken, verificarAdmin_Role],(req, res) => {
+app.delete('/categoria/:id', [verficarToken, verificarAdmin_Role], (req, res) => {
     // Categoria.findByIdAndRemove
     const id = req.params.id;
 
@@ -134,22 +134,22 @@ app.delete('/categoria/:id', [verficarToken, verificarAdmin_Role],(req, res) => 
         if (err || !categoriaBorrada) {
             return res.status(500).json({
                 ok: false,
-                message: 'Categoria no encontrada'
+                message: 'Categoria no encontrada',
             });
         }
 
-        if(!categoriaDB){
+        if (!categoriaBorrada) {
             return res.status(400).json({
                 ok: false,
-                err:{
-                    message: 'No existe la categoria con el id ingresado'
-                }
+                err: {
+                    message: 'No existe la categoria con el id ingresado',
+                },
             });
         }
 
         return res.status(200).json({
             ok: true,
-            categoria: categoriaBorrada
+            categoria: categoriaBorrada,
         });
     });
 });
