@@ -3,16 +3,18 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const app = express();
 // const { verficarToken } = require('../middleware/autenticacion');
-
+const Usuario = require('../models/usuario');
 const extensionesValidas = ['jpg', 'png', 'pdf', 'jpeg'];
 const tiposValidos = ['productos', 'usuarios'];
+const fs = require('fs');
+const path = require('path');
 // opciones por defecto y habilitacion de creacion de arcihvos
 // Lo convierte todos los archivos qe se suban a req.files (LLegaran siempre a esa propiedad)
 app.use(fileUpload({ useTempFiles: true }));
 
 app.put('/upload/:tipo/:id', (req, res) => {
-    let tipo = req.params.tipo;
-    let id = req.params.id;
+    const tipo = req.params.tipo;
+    const id = req.params.id;
 
     if (!req.files) {
         return res.status(400).json({
@@ -89,17 +91,63 @@ app.put('/upload/:tipo/:id', (req, res) => {
                     });
                 }
 
-                return res.status(200).json({
-                    ok: true,
-                    message: 'Se ha subido correctamente',
-                    detalles: {
-                        name: archivoEjemplo.name,
-                        extension: archivoEjemplo.mimetype,
-                    },
-                });
+                if (tipo === 'usuarios') {
+                    imagenUsuario(id, res, nombreArchivo);
+                } else {
+                    imagenProducto(id, res, nombreArchivo);
+                }
             });
         }
     }
 });
+
+function imagenUsuario(id, res, nombreArchivo) {
+    Usuario.findById(id, (err, usuarioDB) => {
+        if (err) {
+            borrarArchivo(nombreArchivo, 'usuarios');
+            return res.status(500).json({
+                ok: false,
+                err,
+            });
+        }
+
+        if (!usuarioDB) {
+            borrarArchivo(nombreArchivo, 'usuarios');
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'Usuario no existe',
+                },
+            });
+        }
+
+        borrarArchivo(usuarioDB.img, 'usuarios');
+
+        usuarioDB.img = nombreArchivo;
+        usuarioDB.save((err, usuarioGuardado) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err,
+                });
+            }
+
+            res.json({
+                ok: true,
+                usuario: usuarioGuardado,
+            });
+        });
+    });
+}
+
+function imagenProducto(id, res, nombreArchivo) {}
+
+function borrarArchivo(nombreImagen, tipo) {
+    const pathImagen = path.resolve(__dirname, `../../uploads/${tipo}/${nombreImagen}`);
+
+    if (fs.existsSync(pathImagen)) {
+        fs.unlinkSync(pathImagen);
+    }
+}
 
 module.exports = app;
