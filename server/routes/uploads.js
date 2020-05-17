@@ -5,11 +5,15 @@ const app = express();
 // const { verficarToken } = require('../middleware/autenticacion');
 
 const extensionesValidas = ['jpg', 'png', 'pdf', 'jpeg'];
+const tiposValidos = ['productos', 'usuarios'];
 // opciones por defecto y habilitacion de creacion de arcihvos
 // Lo convierte todos los archivos qe se suban a req.files (LLegaran siempre a esa propiedad)
 app.use(fileUpload({ useTempFiles: true }));
 
-app.post('/upload', (req, res) => {
+app.put('/upload/:tipo/:id', (req, res) => {
+    let tipo = req.params.tipo;
+    let id = req.params.id;
+
     if (!req.files) {
         return res.status(400).json({
             ok: false,
@@ -19,21 +23,34 @@ app.post('/upload', (req, res) => {
         });
     }
 
+    if (tiposValidos.indexOf(tipo) < 0) {
+        return res.status(400).json({
+            ok: false,
+            err: {
+                message: 'Los tipos permitidos son: ' + tiposValidos.join(','),
+            },
+        });
+    }
+
     if (req.files.archivos.length > 1) {
         // Itero multiples archivos
         req.files.archivos.forEach((archivo) => {
-            let extension = archivo.mimetype.split('/')[1];
+            const extension = archivo.mimetype.split('/')[1];
 
             if (extensionesValidas.indexOf(extension) < 0) {
                 return res.status(400).json({
                     ok: false,
                     err: {
                         message: 'Las extensiones permitidas son: ' + extensionesValidas.join(','),
+                        ext: extension,
                     },
                 });
             }
 
-            archivo.mv(`uploads/${archivo.name}`, (err) => {
+            // Cambiar nombre del archivo
+            const nombreArchivo = `${id}-${new Date().getMilliseconds()}.${extension}`;
+
+            archivo.mv(`uploads/${tipo}/${nombreArchivo}`, (err) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
@@ -49,9 +66,9 @@ app.post('/upload', (req, res) => {
             archivos: req.files.archivos,
         });
     } else {
-        let archivoEjemplo = req.files.archivos;
+        const archivoEjemplo = req.files.archivos;
 
-        let extension = archivoEjemplo.mimetype.split('/')[1];
+        const extension = archivoEjemplo.mimetype.split('/')[1];
 
         if (extensionesValidas.indexOf(extension) < 0) {
             return res.status(400).json({
@@ -61,7 +78,10 @@ app.post('/upload', (req, res) => {
                 },
             });
         } else {
-            archivoEjemplo.mv(`uploads/${archivoEjemplo.name}`, (err) => {
+            // Cambiar nombre del archivo
+            const nombreArchivo = `${id}-${new Date().getMilliseconds()}.${extension}`;
+
+            archivoEjemplo.mv(`uploads/${tipo}/${nombreArchivo}`, (err) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
