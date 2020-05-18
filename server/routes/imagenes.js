@@ -2,9 +2,9 @@ const express = require('express');
 const { validarExistencia } = require('../Controllers/ControladorUpload');
 const path = require('path');
 const app = express();
-const { verficarToken } = require('../middleware/autenticacion');
+const { verficarTokenImg } = require('../middleware/autenticacion');
 
-app.get('/imagen/:tipo/:img', verficarToken, (req, res) => {
+app.get('/imagen/:tipo/:img', verficarTokenImg, (req, res) => {
     const { tipo, img } = req.params;
 
     const noImagePath = path.resolve(__dirname, '../assets/original.jpg');
