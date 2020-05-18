@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 // const { verficarToken } = require('../middleware/autenticacion');
 const Usuario = require('../models/usuario');
+const Producto = require('../models/producto');
 const extensionesValidas = ['jpg', 'png', 'pdf', 'jpeg'];
 const tiposValidos = ['productos', 'usuarios'];
 const fs = require('fs');
@@ -140,7 +141,45 @@ function imagenUsuario(id, res, nombreArchivo) {
     });
 }
 
-function imagenProducto(id, res, nombreArchivo) {}
+function imagenProducto(id, res, nombreArchivo) {
+    Producto.findById(id, (err, productoDB) => {
+        if (err) {
+            borrarArchivo(nombreArchivo, 'productos');
+            return res.status(500).json({
+                ok: false,
+                err,
+            });
+        }
+
+        if (!productoDB) {
+            borrarArchivo(nombreArchivo, 'productos');
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El producto no existe',
+                },
+            });
+        }
+
+        borrarArchivo(nombreArchivo, 'productos');
+
+        productoDB.img = nombreArchivo;
+        productoDB.save((err, newProducto) => {
+            if (err) {
+                borrarArchivo(nombreArchivo, 'productos');
+                return res.status(500).json({
+                    ok: false,
+                    err,
+                });
+            }
+
+            res.status(201).json({
+                ok: true,
+                producto: newProducto,
+            });
+        });
+    });
+}
 
 function borrarArchivo(nombreImagen, tipo) {
     const pathImagen = path.resolve(__dirname, `../../uploads/${tipo}/${nombreImagen}`);
