@@ -90,8 +90,17 @@ function borrarArchivo(nombreImagen, tipo) {
     }
 }
 
+function validarExistencia(noImagePath) {
+    if (fs.existsSync(noImagePath)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 module.exports = {
     borrarArchivo,
     imagenProducto,
     imagenUsuario,
+    validarExistencia,
 };
